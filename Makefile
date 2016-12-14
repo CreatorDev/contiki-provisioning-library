@@ -20,7 +20,7 @@ CFLAGS += -Wall -Wno-pointer-sign -O3
 #needed by tinyDTLS
 CFLAGS += -DDTLS_PEERS_NOHASH=1
 
-PROJECT_SOURCEFILES += provision_communication.c provision_config.c provision_crypto.c provision_library.c bigint.c diffie_hellman_keys_exchanger.c
+PROJECT_SOURCEFILES += provision_communication.c provision_config.c provision_crypto.c provision_library.c rijndael.c bigint.c diffie_hellman_keys_exchanger.c
 
 ifneq (,$(filter  $(TARGET),seedeye mikro-e))
   CFLAGS += -fno-short-double
