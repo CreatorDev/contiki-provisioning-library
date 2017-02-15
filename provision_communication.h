@@ -74,7 +74,9 @@ typedef struct __attribute__((__packed__)) {
     uint8_t securityMode;
     uint8_t pskKeySize;
     uint8_t psk[32];
-    uint8_t bootstrapUri[200];
+    uint8_t identitySize;
+    uint8_t identity[24];
+    uint8_t bootstrapUri[175];
 } Provision_DeviceServerConfig;
 
 //struct for Provision_NetworkCommandType_NETWORK_CONFIG

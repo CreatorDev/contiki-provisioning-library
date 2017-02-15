@@ -363,7 +363,10 @@ static void finalizeConfiguration() {
   _ProvisionConfiguration.pskKeySize = cfg->pskKeySize;
   _ProvisionConfiguration.pskKey = malloc(cfg->pskKeySize);
   memcpy(_ProvisionConfiguration.pskKey, cfg->psk, cfg->pskKeySize);
-  _ProvisionConfiguration.bootstrapUri = strndup(cfg->bootstrapUri, 200);
+  _ProvisionConfiguration.identitySize = cfg->identitySize;
+  _ProvisionConfiguration.identity = malloc(cfg->identitySize);
+  memcpy(_ProvisionConfiguration.identity, cfg->identity, cfg->identitySize);
+  _ProvisionConfiguration.bootstrapUri = strndup(cfg->bootstrapUri, 175);
 
 #ifdef PROVISION_DEBUG
   printf("Provision: defaultRouteUri=%s\n", _ProvisionConfiguration.defaultRouteUri);

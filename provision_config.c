@@ -46,6 +46,8 @@ Provision_Configuration _ProvisionConfiguration = {
   .securityMode = 0,
   .pskKeySize = 0,
   .pskKey = NULL,
+  .identitySize = 0,
+  .identity = NULL,
   .bootstrapUri = NULL,
   .defaultRouteUri = NULL,
   .endpointName = NULL,
@@ -127,6 +129,9 @@ void provision_loadConfig() {
   success &= cfs_read(fileHandle, &_ProvisionConfiguration.pskKeySize,
     sizeof(_ProvisionConfiguration.pskKeySize)) >= 0;
 
+  success &= cfs_read(fileHandle, &_ProvisionConfiguration.identitySize,
+    sizeof(_ProvisionConfiguration.identitySize)) >= 0;
+
   if (success == false) {
 #ifdef PROVISION_DEBUG
       printf("Provision: Error - while loaging config\n");
@@ -135,6 +140,7 @@ void provision_loadConfig() {
   }
 
   readString(fileHandle, (char**)&_ProvisionConfiguration.pskKey);
+  readString(fileHandle, (char**)&_ProvisionConfiguration.identity);
   readString(fileHandle, &_ProvisionConfiguration.bootstrapUri);
   readString(fileHandle, &_ProvisionConfiguration.defaultRouteUri);
   readString(fileHandle, &_ProvisionConfiguration.endpointName);
@@ -155,8 +161,11 @@ static bool innerSaveConfig(int* outFileHandle) {
     sizeof(_ProvisionConfiguration.securityMode)) >= 0;
   saveResult &= cfs_write(fileHandle, &_ProvisionConfiguration.pskKeySize,
     sizeof(_ProvisionConfiguration.pskKeySize)) >= 0;
+  saveResult &= cfs_write(fileHandle, &_ProvisionConfiguration.identitySize,
+    sizeof(_ProvisionConfiguration.identitySize)) >= 0;
 
   saveResult &= writeString(fileHandle, _ProvisionConfiguration.pskKey);
+  saveResult &= writeString(fileHandle, _ProvisionConfiguration.identity);
   saveResult &= writeString(fileHandle, _ProvisionConfiguration.bootstrapUri);
   saveResult &= writeString(fileHandle, _ProvisionConfiguration.defaultRouteUri);
   saveResult &= writeString(fileHandle, _ProvisionConfiguration.endpointName);
@@ -190,11 +199,13 @@ void provision_clearConfig() {
 #endif
   if (isLoaded) {
     FREE_AND_NULL(_ProvisionConfiguration.pskKey);
+    FREE_AND_NULL(_ProvisionConfiguration.identity);
     FREE_AND_NULL(_ProvisionConfiguration.bootstrapUri);
     FREE_AND_NULL(_ProvisionConfiguration.defaultRouteUri);
     FREE_AND_NULL(_ProvisionConfiguration.endpointName);
     FREE_AND_NULL(_ProvisionConfiguration.dnsServer);
     _ProvisionConfiguration.pskKeySize = 0;
+    _ProvisionConfiguration.identitySize = 0;
     _ProvisionConfiguration.securityMode = 0;
     isLoaded = false;
   }
