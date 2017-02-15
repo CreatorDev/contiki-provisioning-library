@@ -352,21 +352,26 @@ static void finalizeConfiguration() {
   //Network configuration
   provision_decodeBytes(_DelayedNetworkConfigData, _DelayedNetworkConfigDataLen);
   Provision_NewtworkConfig* netCfg = (Provision_NewtworkConfig*)_DelayedNetworkConfigData;
-  _ProvisionConfiguration.defaultRouteUri = strndup(netCfg->defaultRouteUri, 100);
-  _ProvisionConfiguration.dnsServer = strndup(netCfg->dnsServer, 100);
-  _ProvisionConfiguration.endpointName = strndup(netCfg->endpointName, 24);
+  _ProvisionConfiguration.defaultRouteUri = strndup(netCfg->defaultRouteUri, PROV_FIELD_SIZE_ROUTER_URI);
+  _ProvisionConfiguration.dnsServer = strndup(netCfg->dnsServer, PROV_FIELD_SIZE_DNS_SERVER);
+  _ProvisionConfiguration.endpointName = strndup(netCfg->endpointName, PROV_FIELD_SIZE_ENDPOINT_NAME);
 
   //Server configuration
   provision_decodeBytes(_DelayedServerConfigData, _DelayedServerConfigDataLen);
   Provision_DeviceServerConfig* cfg = (Provision_DeviceServerConfig*)_DelayedServerConfigData;
   _ProvisionConfiguration.securityMode = cfg->securityMode;
+
   _ProvisionConfiguration.pskKeySize = cfg->pskKeySize;
-  _ProvisionConfiguration.pskKey = malloc(cfg->pskKeySize);
-  memcpy(_ProvisionConfiguration.pskKey, cfg->psk, cfg->pskKeySize);
+  int tmpLen = cfg->pskKeySize > PROV_FIELD_SIZE_PSK ? PROV_FIELD_SIZE_PSK : cfg->pskKeySize;
+  _ProvisionConfiguration.pskKey = malloc(tmpLen);
+  memcpy(_ProvisionConfiguration.pskKey, cfg->psk, tmpLen);
+
   _ProvisionConfiguration.identitySize = cfg->identitySize;
-  _ProvisionConfiguration.identity = malloc(cfg->identitySize);
-  memcpy(_ProvisionConfiguration.identity, cfg->identity, cfg->identitySize);
-  _ProvisionConfiguration.bootstrapUri = strndup(cfg->bootstrapUri, 175);
+  tmpLen = cfg->identitySize > PROV_FIELD_SIZE_IDENTITY ? PROV_FIELD_SIZE_IDENTITY : cfg->identitySize;
+  _ProvisionConfiguration.identity = malloc(tmpLen);
+  memcpy(_ProvisionConfiguration.identity, cfg->identity, tmpLen);
+
+  _ProvisionConfiguration.bootstrapUri = strndup(cfg->bootstrapUri, PROV_FIELD_SIZE_BOOTSTRAP_URI);
 
 #ifdef PROVISION_DEBUG
   printf("Provision: defaultRouteUri=%s\n", _ProvisionConfiguration.defaultRouteUri);

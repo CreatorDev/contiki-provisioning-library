@@ -69,21 +69,29 @@ typedef struct {
   Provision_NetworkCommandHandler handler;
 } Provision_NetworkCommandHandlerBind;
 
+#define PROV_FIELD_SIZE_PSK 32
+#define PROV_FIELD_SIZE_IDENTITY 24
+#define PROV_FIELD_SIZE_BOOTSTRAP_URI 175
+
 //struct for Provision_NetworkCommandType_SERVER_CONFIG
 typedef struct __attribute__((__packed__)) {
     uint8_t securityMode;
     uint8_t pskKeySize;
-    uint8_t psk[32];
+    uint8_t psk[PROV_FIELD_SIZE_PSK];
     uint8_t identitySize;
-    uint8_t identity[24];
-    uint8_t bootstrapUri[175];
+    uint8_t identity[PROV_FIELD_SIZE_IDENTITY];
+    uint8_t bootstrapUri[PROV_FIELD_SIZE_BOOTSTRAP_URI];
 } Provision_DeviceServerConfig;
+
+#define PROV_FIELD_SIZE_ROUTER_URI 100
+#define PROV_FIELD_SIZE_DNS_SERVER 100
+#define PROV_FIELD_SIZE_ENDPOINT_NAME 24
 
 //struct for Provision_NetworkCommandType_NETWORK_CONFIG
 typedef struct __attribute__((__packed__)) {
-  char defaultRouteUri[100];  //can be IPv6 or URL
-  char dnsServer[100];
-  char endpointName[24];
+  char defaultRouteUri[PROV_FIELD_SIZE_ROUTER_URI];  //can be IPv6 or URL
+  char dnsServer[PROV_FIELD_SIZE_DNS_SERVER];
+  char endpointName[PROV_FIELD_SIZE_ENDPOINT_NAME];
 } Provision_NewtworkConfig;
 
 void provision_setCommandHandlers(Provision_NetworkCommandHandlerBind* handlers, Provision_CommunicationListener stateListener);
