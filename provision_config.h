@@ -42,6 +42,8 @@ typedef struct {
   uint8_t   securityMode;
   uint8_t   pskKeySize; //in bytes not bits!
   uint8_t*  pskKey;
+  uint8_t   identitySize;
+  uint8_t*  identity;
   char*     bootstrapUri;
   char*     defaultRouteUri;  //can be IPv6 or URL
   char*     endpointName;

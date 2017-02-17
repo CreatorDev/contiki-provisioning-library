@@ -39,7 +39,7 @@
 
 #ifndef PROVISION_DAEMON
 //Here is name for mDNS resolve, this library will try to establish connetion with it.
-#define PROVISION_DAEMON "OpenWrt.local"
+#define PROVISION_DAEMON "myCi40.local"
 #endif
 
 #ifndef PROVISION_DAEMON_PORT
