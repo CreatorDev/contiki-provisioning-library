@@ -60,6 +60,36 @@ static inline void provision_fatalError() {
   watchdog_reboot();
 }
 
+static void readBinary(int fileHandle, uint8_t** dest, uint8_t* outLen)
+{
+  if (*dest != NULL) {
+      free(*dest);
+      *dest = NULL;
+  }
+  uint16_t len;
+  int result = cfs_read(fileHandle, &len, sizeof(len));
+  if (result < 0) {
+#ifdef PROVISION_DEBUG
+      printf("Provision: Error %d - while loaging config\n", result);
+#endif
+      provision_fatalError();
+  }
+  if (len == 0) {
+      *dest = NULL;
+      *outLen = 0;
+      return;
+  }
+  *dest = malloc(len);
+  result = cfs_read(fileHandle, *dest, len);
+  if (result < 0) {
+#ifdef PROVISION_DEBUG
+      printf("Provision: Error %d - while loaging config\n", result);
+#endif
+      provision_fatalError();
+  }
+  *outLen = len;
+}
+
 static void readString(int fileHandle, char** dest)
 {
   if (*dest != NULL) {
@@ -86,12 +116,11 @@ static void readString(int fileHandle, char** dest)
 #endif
       provision_fatalError();
   }
-  *(dest + len) = 0;
+  *(*dest + len) = 0;
 }
 
-static bool writeString(int fileHandle, char* src)
+static bool writeBinary(int fileHandle, uint8_t* src, uint16_t len)
 {
-  uint16_t len = strlen(src);
   int result = cfs_write(fileHandle, &len, sizeof(len));
   if (result < 0) {
       return false;
@@ -103,6 +132,12 @@ static bool writeString(int fileHandle, char* src)
       }
   }
   return true;
+}
+
+static bool writeString(int fileHandle, char* src)
+{
+  uint16_t len = strlen(src);
+  return writeBinary(fileHandle, (uint8_t*)src, len);
 }
 
 bool provision_hasConfigData() {
@@ -123,13 +158,8 @@ void provision_loadConfig() {
       printf("Provision: Error - while opening config\n");
       provision_fatalError();
   }
-
   bool success = cfs_read(fileHandle, &_ProvisionConfiguration.securityMode,
     sizeof(_ProvisionConfiguration.securityMode)) >= 0;
-
-  success &= cfs_read(fileHandle, &_ProvisionConfiguration.pskKeySize,
-    sizeof(_ProvisionConfiguration.pskKeySize)) >= 0;
-
   success &= cfs_read(fileHandle, &_ProvisionConfiguration.identitySize,
     sizeof(_ProvisionConfiguration.identitySize)) >= 0;
 
@@ -139,16 +169,15 @@ void provision_loadConfig() {
 #endif
       provision_fatalError();
   }
-
-  readString(fileHandle, (char**)&_ProvisionConfiguration.pskKey);
+  readBinary(fileHandle, &_ProvisionConfiguration.pskKey, &_ProvisionConfiguration.pskKeySize);
   readString(fileHandle, (char**)&_ProvisionConfiguration.identity);
   readString(fileHandle, &_ProvisionConfiguration.bootstrapUri);
   readString(fileHandle, &_ProvisionConfiguration.defaultRouteUri);
   readString(fileHandle, &_ProvisionConfiguration.endpointName);
   readString(fileHandle, &_ProvisionConfiguration.dnsServer);
-
-  memset(_ProvisionConfiguration.identity + _ProvisionConfiguration.identitySize, 0, PROV_FIELD_SIZE_IDENTITY - _ProvisionConfiguration.identitySize);
-  memset(_ProvisionConfiguration.pskKey + _ProvisionConfiguration.pskKeySize, 0, PROV_FIELD_SIZE_IDENTITY - _ProvisionConfiguration.pskKeySize);
+  if (_ProvisionConfiguration.identity != NULL) {
+    memset(_ProvisionConfiguration.identity + _ProvisionConfiguration.identitySize, 0, PROV_FIELD_SIZE_IDENTITY - _ProvisionConfiguration.identitySize);
+  }
 
   cfs_close(fileHandle);
 }
@@ -163,12 +192,10 @@ static bool innerSaveConfig(int* outFileHandle) {
   bool saveResult = true;
   saveResult &= cfs_write(fileHandle, &_ProvisionConfiguration.securityMode,
     sizeof(_ProvisionConfiguration.securityMode)) >= 0;
-  saveResult &= cfs_write(fileHandle, &_ProvisionConfiguration.pskKeySize,
-    sizeof(_ProvisionConfiguration.pskKeySize)) >= 0;
   saveResult &= cfs_write(fileHandle, &_ProvisionConfiguration.identitySize,
     sizeof(_ProvisionConfiguration.identitySize)) >= 0;
 
-  saveResult &= writeString(fileHandle, _ProvisionConfiguration.pskKey);
+  saveResult &= writeBinary(fileHandle, _ProvisionConfiguration.pskKey, _ProvisionConfiguration.pskKeySize);
   saveResult &= writeString(fileHandle, _ProvisionConfiguration.identity);
   saveResult &= writeString(fileHandle, _ProvisionConfiguration.bootstrapUri);
   saveResult &= writeString(fileHandle, _ProvisionConfiguration.defaultRouteUri);

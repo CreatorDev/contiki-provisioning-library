@@ -369,6 +369,7 @@ static void finalizeConfiguration() {
   _ProvisionConfiguration.identitySize = cfg->identitySize;
   tmpLen = cfg->identitySize > PROV_FIELD_SIZE_IDENTITY ? PROV_FIELD_SIZE_IDENTITY : cfg->identitySize;
   _ProvisionConfiguration.identity = malloc(tmpLen);
+  memset(_ProvisionConfiguration.identity, 0, PROV_FIELD_SIZE_IDENTITY);
   memcpy(_ProvisionConfiguration.identity, cfg->identity, tmpLen);
 
   _ProvisionConfiguration.bootstrapUri = strndup(cfg->bootstrapUri, PROV_FIELD_SIZE_BOOTSTRAP_URI);
@@ -404,9 +405,12 @@ static void cleanupAndBootMasterProcess() {
   GPIO_CLR(LED2_PORT, LED2_PIN);
 
 #ifdef PROVISION_DEBUG
+  printf("Provision: defaultRouteUri=%s\n", _ProvisionConfiguration.defaultRouteUri);
+  printf("Provision: dnsServer=%s\n", _ProvisionConfiguration.dnsServer);
+  printf("Provision: endpointName=%s\n", _ProvisionConfiguration.endpointName);
+  printf("Provision: bootstrapUri=%s\n", _ProvisionConfiguration.bootstrapUri);
   printf("Provision: Done.\n");
 #endif
-
   process_start(_ProcessToRun, NULL);
 }
 
