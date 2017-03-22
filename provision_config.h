@@ -45,9 +45,9 @@ typedef struct {
   uint8_t   identitySize;
   uint8_t*  identity;
   char*     bootstrapUri;
-  char*     defaultRouteUri;  //can be IPv6 or URL
+  char*     defaultRouteUri;  //must be IP 
   char*     endpointName;
-  char*     dnsServer;
+  char*     dnsServer;        //must be IP 
 } Provision_Configuration;
 
 extern Provision_Configuration _ProvisionConfiguration;

@@ -37,10 +37,10 @@
 #define __PROJECT_CONF_H__
 
 /* Custom channel and PAN ID configuration for your project. */
-/*
-#define RF_CHANNEL                  22
-#define IEEE802154_CONF_PANID       0xABCA
-*/
+
+#define RF_CHANNEL                  26
+#define IEEE802154_CONF_PANID       0xABCD
+
 
 #define UIP_CONF_TCP                      1
 #define UIP_CONF_UDP                      1

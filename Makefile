@@ -4,15 +4,15 @@ VERSION?=$(shell git describe --abbrev=4 --dirty --always --tags)
 CONTIKI=../../contiki
 CONTIKI_WITH_IPV6=1
 CONTIKI_WITH_RPL=0
-USE_SERIAL_PADS=1
+USE_SERIAL_PADS=0
 
 TARGET=mikro-e
 
 CFLAGS += -DWITH_AES_DECRYPT=1
 
 #6lowpan type
-#USE_CA8210=1
-USE_CC2520=1
+USE_CA8210=1
+#USE_CC2520=1
 
 CFLAGS += -DPROJECT_CONF_H=\"project-conf.h\" -DVERSION='\"$(VERSION)\"'
 CFLAGS += -Wall -Wno-pointer-sign -O3
